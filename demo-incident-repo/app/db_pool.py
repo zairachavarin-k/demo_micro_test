@@ -67,5 +67,8 @@ def ejecutar_consulta_simulada(datos):
         resultado = {"procesado": True, "items": len(datos)}
         return resultado
     finally:
-        # CORRECCIÓN: siempre liberamos la conexión, independientemente de FAULT_MODE
-        conexion.liberar()
+        if FAULT_MODE == "pool_leak":
+            # BUG INTENCIONAL: no liberamos la conexión.
+            pass
+        else:
+            conexion.liberar()

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Status Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        .dashboard-header {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .dashboard-header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-card.red {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            border-color: #cc4455;
+        }
+
+        .metric-card.orange {
+            background: linear-gradient(135deg, #ff9500 0%, #f77f00 100%);
+            border-color: #d66f00;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 15px;
+        }
+
+        .metric-value {
+            font-size: 42px;
+            font-weight: 700;
+            color: white;
+            font-family: 'Courier New', monospace;
+            line-height: 1.2;
+        }
+
+        .status-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .status-banner {
+            padding: 25px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .status-banner.active {
+            background: linear-gradient(135deg, #ff4757 0%, #ff6348 100%);
+            border-color: #d63031;
+        }
+
+        .status-banner.resolved {
+            background: linear-gradient(135deg, #2ed573 0%, #26de81 100%);
+            border-color: #20c997;
+        }
+
+        .status-text {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            flex: 1;
+        }
+
+        .status-button {
+            padding: 12px 32px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            color: white;
+            background: rgba(255, 255, 255, 0.25);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .status-button:hover {
+            background: rgba(255, 255, 255, 0.35);
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        .status-button:active {
+            transform: scale(0.98);
+        }
+
+        .status-banner.resolved .status-button {
+            display: none;
+        }
+
+        .timestamp {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 20px;
+            }
+
+            .metrics-row {
+                gap: 15px;
+            }
+
+            .metric-card {
+                padding: 20px;
+            }
+
+            .metric-value {
+                font-size: 32px;
+            }
+
+            .status-banner {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .status-text {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>🚨 Incident Status Dashboard</h1>
+            <p>Real-time monitoring and incident management</p>
+        </div>
+
+        <div class="metrics-row">
+            <div class="metric-card red">
+                <div class="metric-label">Response Time</div>
+                <div class="metric-value">3000ms</div>
+            </div>
+            <div class="metric-card red">
+                <div class="metric-label">Error Rate</div>
+                <div class="metric-value">87.5%</div>
+            </div>
+            <div class="metric-card orange">
+                <div class="metric-label">Business Impact</div>
+                <div class="metric-value">$2,500/hr</div>
+            </div>
+        </div>
+
+        <div class="status-section">
+            <div class="status-banner active" id="statusBanner">
+                <div class="status-text" id="statusText">🔴 INCIDENT ACTIVE</div>
+                <button class="status-button" id="resolveBtn" onclick="toggleStatus()">
+                    Mark Resolved
+                </button>
+            </div>
+        </div>
+
+        <div class="timestamp" id="timestamp"></div>
+    </div>
+
+    <script>
+        // Initialize timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            const formattedTime = now.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            document.getElementById('timestamp').textContent = `Last updated: ${formattedTime}`;
+        }
+
+        // Toggle incident status
+        function toggleStatus() {
+            const banner = document.getElementById('statusBanner');
+            const statusText = document.getElementById('statusText');
+            const button = document.getElementById('resolveBtn');
+
+            banner.classList.toggle('active');
+            banner.classList.toggle('resolved');
+
+            if (banner.classList.contains('resolved')) {
+                statusText.textContent = '✅ RESOLVED';
+                button.textContent = 'Reopen Incident';
+            } else {
+                statusText.textContent = '🔴 INCIDENT ACTIVE';
+                button.textContent = 'Mark Resolved';
+            }
+
+            updateTimestamp();
+        }
+
+        // Restore button label when resolved
+        document.getElementById('resolveBtn').addEventListener('click', function() {
+            const banner = document.getElementById('statusBanner');
+            if (banner.classList.contains('active')) {
+                this.style.display = 'block';
+            }
+        });
+
+        // Initialize on page load
+        window.addEventListener('load', updateTimestamp);
+    </script>
+</body>
+</html>

@@ -9,7 +9,7 @@ reproduciendo un incidente de agotamiento del pool de conexiones.
 import time
 from fastapi import FastAPI, HTTPException
 
-from app.db_pool import ejecutar_consulta_simulada, FAULT_MODE
+from app.db_pool import ejecutar_consulta_simulada, FAULT_MODE, get_pool_metrics
 
 app = FastAPI(
     title="Servicio de Transacciones",
@@ -66,3 +66,14 @@ def obtener_transaccion(transaction_id: int):
         if t["id"] == transaction_id:
             return t
     raise HTTPException(status_code=404, detail="Transacción no encontrada")
+
+
+@app.get("/evidence")
+def evidence():
+    """Endpoint de evidencia para degradación de rendimiento.
+
+    Devuelve un JSON con métricas del pool (pool_size, conexiones activas,
+    estimación de permisos disponibles, y el modo de fallo). Esto ayuda a
+    recolectar evidencia cuando el servicio muestra latencia alta o 503s.
+    """
+    return get_pool_metrics()

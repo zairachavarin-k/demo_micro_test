@@ -34,6 +34,11 @@ class Conexion:
         """Devuelve la conexión al pool. Debe llamarse siempre."""
         if not self._liberada:
             _pool.release()
+            # Mantener contador de conexiones activas coherente.
+            with _active_lock:
+                global _active_count
+                if _active_count > 0:
+                    _active_count -= 1
             self._liberada = True
 
 
@@ -48,6 +53,10 @@ def obtener_conexion(timeout=3.0):
             "No hay conexiones disponibles en el pool "
             f"(tamaño={POOL_SIZE}). Posible fuga de conexiones."
         )
+    # Registrar una conexión activa (para evidencia/diagnóstico).
+    with _active_lock:
+        global _active_count
+        _active_count += 1
     return Conexion()
 
 
@@ -69,6 +78,34 @@ def ejecutar_consulta_simulada(datos):
     finally:
         if FAULT_MODE == "pool_leak":
             # BUG INTENCIONAL: no liberamos la conexión.
+            # En modo de fuga dejamos _active_count sin decrementar para
+            # que refleje la fuga de conexiones (evidencia).
             pass
         else:
             conexion.liberar()
+
+
+# Instrumentación mínima para recopilación de evidencia
+_active_count = 0
+_active_lock = threading.Lock()
+
+
+def get_pool_metrics():
+    """Devuelve métricas/estado del pool para evidencia de degradación.
+
+    Retorna un diccionario con: pool_size, active_connections,
+    available_permits (estimate), y el modo de fallo activo.
+    """
+    with _active_lock:
+        active = _active_count
+
+    # threading.Semaphore no expone el contador públicamente; estimar
+    # disponibles como POOL_SIZE - active para esta demo.
+    available = max(0, POOL_SIZE - active)
+
+    return {
+        "pool_size": POOL_SIZE,
+        "active_connections": active,
+        "available_permits_estimate": available,
+        "fault_mode": FAULT_MODE,
+    }
